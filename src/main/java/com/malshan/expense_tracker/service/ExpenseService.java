@@ -4,6 +4,7 @@ import com.malshan.expense_tracker.dto.ExpenseRequest;
 import com.malshan.expense_tracker.entity.Category;
 import com.malshan.expense_tracker.entity.Expense;
 import com.malshan.expense_tracker.entity.User;
+import com.malshan.expense_tracker.exception.ResourceNotFoundException;
 import com.malshan.expense_tracker.repository.CategoryRepository;
 import com.malshan.expense_tracker.repository.ExpenseRepository;
 import com.malshan.expense_tracker.repository.UserRepository;
@@ -40,10 +41,10 @@ public class ExpenseService {
 
         
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         if (!category.getUser().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("You don't have permission to use this category");
+            throw new ResourceNotFoundException("You don't have permission to use this category");
         }
 
         Expense expense = new Expense();
@@ -65,15 +66,15 @@ public class ExpenseService {
         User currentUser = getCurrentUser();
 
         Expense expense = expenseRepository.findById(expenseId)
-                .orElseThrow(() -> new RuntimeException("Expense not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
 
         // Ownership check
         if (!expense.getUser().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("You don't have permission to update this expense");
+            throw new ResourceNotFoundException("You don't have permission to update this expense");
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         expense.setAmount(request.getAmount());
         expense.setDescription(request.getDescription());
@@ -87,10 +88,10 @@ public class ExpenseService {
         User currentUser = getCurrentUser();
 
         Expense expense = expenseRepository.findById(expenseId)
-                .orElseThrow(() -> new RuntimeException("Expense not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found"));
 
         if (!expense.getUser().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("You don't have permission to delete this expense");
+            throw new ResourceNotFoundException("You don't have permission to delete this expense");
         }
 
         expenseRepository.delete(expense);

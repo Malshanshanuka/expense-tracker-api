@@ -5,6 +5,7 @@ import com.malshan.expense_tracker.dto.AuthResponse;
 import com.malshan.expense_tracker.dto.LoginRequest;
 import com.malshan.expense_tracker.dto.RegisterRequest;
 import com.malshan.expense_tracker.entity.User;
+import com.malshan.expense_tracker.exception.DuplicateResourceException;
 import com.malshan.expense_tracker.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,7 +36,7 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already registered");
+            throw new DuplicateResourceException("Email already registered");
         }
 
         User user = new User();

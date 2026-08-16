@@ -2,6 +2,8 @@ package com.malshan.expense_tracker.service;
 
 import com.malshan.expense_tracker.entity.Category;
 import com.malshan.expense_tracker.entity.User;
+import com.malshan.expense_tracker.exception.ResourceNotFoundException;
+import com.malshan.expense_tracker.exception.UnauthorizedException;
 import com.malshan.expense_tracker.repository.CategoryRepository;
 import com.malshan.expense_tracker.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,11 +22,10 @@ public class CategoryService {
         this.userRepository = userRepository;
     }
 
-
     private User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     public Category createCategory(String name) {
@@ -46,10 +47,10 @@ public class CategoryService {
         User currentUser = getCurrentUser();
 
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         if (!category.getUser().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("You don't have permission to delete this category");
+            throw new UnauthorizedException("You don't have permission to delete this category");
         }
 
         categoryRepository.delete(category);
