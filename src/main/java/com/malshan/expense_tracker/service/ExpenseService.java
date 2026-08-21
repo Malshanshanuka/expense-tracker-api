@@ -76,6 +76,10 @@ public class ExpenseService {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
+        if (!category.getUser().getId().equals(currentUser.getId())) {
+            throw new ResourceNotFoundException("You don't have permission to use this category");
+        }
+
         expense.setAmount(request.getAmount());
         expense.setDescription(request.getDescription());
         expense.setExpenseDate(request.getExpenseDate());

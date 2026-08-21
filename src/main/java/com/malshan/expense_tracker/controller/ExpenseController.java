@@ -26,6 +26,7 @@ public class ExpenseController {
                 expense.getAmount(),
                 expense.getDescription(),
                 expense.getExpenseDate(),
+                expense.getCategory().getId(),
                 expense.getCategory().getName()
         );
     }

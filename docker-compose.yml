@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: expense_tracker_db
+    environment:
+      POSTGRES_DB: expense_tracker_db
+      POSTGRES_USER: malshanshanuka
+      POSTGRES_PASSWORD: expense123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U malshanshanuka -d expense_tracker_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./expense-tracker-api
+      dockerfile: Dockerfile
+    container_name: expense_tracker_api
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - SPRING_DATASOURCE_USERNAME=malshanshanuka
+      - SPRING_DATASOURCE_PASSWORD=expense123
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

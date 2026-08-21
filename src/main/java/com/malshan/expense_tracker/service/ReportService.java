@@ -80,13 +80,10 @@ public class ReportService {
             Document document = new Document(pdfDoc);
 
 
-            document.add(new Paragraph("Expense Report")
+            Paragraph title = new Paragraph("Expense Report")
                     .setFontSize(20)
-                    .setBold()
-                    .setUnderline())
-                    .setFontSize(20)
-                    .setBold()
-                    .setUnderline(1f, -2f);
+                    .setBold();
+            document.add(title);
 
             document.add(new Paragraph("User: " + currentUser.getFullName()));
             document.add(new Paragraph("Period: " + month + "/" + year));

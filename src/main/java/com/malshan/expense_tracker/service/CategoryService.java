@@ -2,9 +2,11 @@ package com.malshan.expense_tracker.service;
 
 import com.malshan.expense_tracker.entity.Category;
 import com.malshan.expense_tracker.entity.User;
+import com.malshan.expense_tracker.exception.DuplicateResourceException;
 import com.malshan.expense_tracker.exception.ResourceNotFoundException;
 import com.malshan.expense_tracker.exception.UnauthorizedException;
 import com.malshan.expense_tracker.repository.CategoryRepository;
+import com.malshan.expense_tracker.repository.ExpenseRepository;
 import com.malshan.expense_tracker.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,10 +18,16 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final ExpenseRepository expenseRepository;
 
-    public CategoryService(CategoryRepository categoryRepository, UserRepository userRepository) {
+    public CategoryService(
+            CategoryRepository categoryRepository,
+            UserRepository userRepository,
+            ExpenseRepository expenseRepository
+    ) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.expenseRepository = expenseRepository;
     }
 
     private User getCurrentUser() {
@@ -51,6 +59,10 @@ public class CategoryService {
 
         if (!category.getUser().getId().equals(currentUser.getId())) {
             throw new UnauthorizedException("You don't have permission to delete this category");
+        }
+
+        if (expenseRepository.existsByCategoryId(categoryId)) {
+            throw new DuplicateResourceException("Cannot delete category with associated expenses");
         }
 
         categoryRepository.delete(category);
